@@ -33,10 +33,10 @@ export class UsersService {
     );
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number, createUserDto: CreateUserDto) {
     const index = this.users.findIndex((user) => user.id == id);
-    if (index > 0) {
-      this.users[index].nome = updateUserDto.nome;
+    if (index >= 0) {
+      this.users[index] = createUserDto;
       return this.users[index];
     }
     throw new HttpException(
@@ -47,7 +47,7 @@ export class UsersService {
 
   remove(id: number) {
     const index = this.users.findIndex((user) => user.id == id);
-    if (index > 0) {
+    if (index >= 0) {
       this.users.splice(index, 1);
     } else {
       throw new HttpException(

@@ -1,7 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { FrasesService } from './frases.service';
 import { CreateFraseDto } from './dto/create-frase.dto';
-import { UpdateFraseDto } from './dto/update-frase.dto';
+import { DataBaseFraseDto } from './dto/database-frase.dto';
 
 @Controller('frases')
 export class FrasesController {
@@ -17,17 +25,17 @@ export class FrasesController {
     return this.frasesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.frasesService.findOne(+id);
+  @Get('usuario/:id')
+  findByUsuario(@Param('id') id: string) {
+    return this.frasesService.findByUsuario(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFraseDto: UpdateFraseDto) {
-    return this.frasesService.update(+id, updateFraseDto);
+  @Patch('usuario/:id')
+  update(@Param('id') id: string, @Body() dataBaseFraseDto: DataBaseFraseDto) {
+    return this.frasesService.update(+id, dataBaseFraseDto);
   }
 
-  @Delete(':id')
+  @Delete('usuario/:id')
   remove(@Param('id') id: string) {
     return this.frasesService.remove(+id);
   }
