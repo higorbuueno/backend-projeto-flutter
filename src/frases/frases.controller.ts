@@ -36,7 +36,7 @@ export class FrasesController {
   }
 
   @Delete('usuario/:id')
-  remove(@Param('id') id: string) {
-    return this.frasesService.remove(+id);
+  remove(@Param('id') id: string, @Body() createFraseDto: CreateFraseDto) {
+    return this.frasesService.remove(+id, createFraseDto.frase);
   }
 }

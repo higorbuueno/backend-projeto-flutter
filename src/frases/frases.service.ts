@@ -23,7 +23,7 @@ export class FrasesService {
     const index = this.databaseFrases.findIndex(
       (frasesDoUsuario) => frasesDoUsuario.idUser == createFraseDto.idUser,
     );
-    if (index) {
+    if (index >= 0) {
       this.databaseFrases[index].listaFrases.push(createFraseDto.frase);
       return this.databaseFrases[index];
     }
