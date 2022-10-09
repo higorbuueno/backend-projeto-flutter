@@ -52,12 +52,12 @@ export class UsersService {
     );
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number, createUserDto: CreateUserDto) {
     this.verificarSeExisteUsuarios();
 
     const index = this.users.findIndex((user) => user.id == id);
-    if (index > 0) {
-      this.users[index].nome = updateUserDto.nome;
+    if (index >= 0) {
+      this.users[index] = createUserDto;
       return this.users[index];
     }
     throw new HttpException(
@@ -70,7 +70,7 @@ export class UsersService {
     this.verificarSeExisteUsuarios();
 
     const index = this.users.findIndex((user) => user.id == id);
-    if (index > 0) {
+    if (index >= 0) {
       this.users.splice(index, 1);
       this.frasesService.deleteAllByUserId(id);
     } else {
