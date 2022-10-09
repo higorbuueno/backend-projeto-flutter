@@ -4,6 +4,7 @@ import { FrasesController } from './frases.controller';
 
 @Module({
   controllers: [FrasesController],
-  providers: [FrasesService]
+  providers: [FrasesService],
+  exports: [FrasesService]
 })
 export class FrasesModule {}

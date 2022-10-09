@@ -32,4 +32,8 @@ export class FrasesService {
   remove(id: number) {
     return `This action removes a #${id} frase`;
   }
+
+  deleteAllByUserId(id: number) {
+    return `This action removes a #${id} frase`;
+  }
 }
