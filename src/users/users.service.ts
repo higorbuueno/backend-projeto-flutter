@@ -1,90 +1,64 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { FrasesService } from 'src/frases/frases.service';
+import { DeleteResult, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(private frasesService: FrasesService) {}
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+    private frasesService: FrasesService,
+  ) {}
   users: CreateUserDto[];
 
-  create(createUserDto: CreateUserDto) {
-    if (this.users) {
-      const newId = this.users[this.users.length - 1].id + 1;
-      createUserDto.id = newId;
-      this.users.push(createUserDto);
-    } else {
-      createUserDto.id = 1;
-      this.users = [createUserDto];
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    try {
+      return await this.usersRepository.save(createUserDto);
+    } catch (error) {
+      throw new HttpException('Erro ao criar usuário', HttpStatus.BAD_REQUEST);
     }
-    return createUserDto;
   }
 
-  findAll() {
-    this.verificarSeExisteUsuarios();
-
-    return this.users;
-  }
-
-  findOne(id: number): CreateUserDto {
-    this.verificarSeExisteUsuarios();
-
-    const userResult = this.users.filter((user) => user.id == id);
-    if (userResult[0]) {
-      return userResult[0];
-    }
-    throw new HttpException(
-      'Nenhum usuário cadastrado com este id',
-      HttpStatus.BAD_REQUEST,
-    );
-  }
-
-  findByUsername(username: String): CreateUserDto {
-    this.verificarSeExisteUsuarios();
-
-    const userResult = this.users.filter((user) => user.nome == username);
-    if (userResult[0]) {
-      return userResult[0];
-    }
-    throw new HttpException(
-      'Nenhum usuário cadastrado com este id',
-      HttpStatus.BAD_REQUEST,
-    );
-  }
-
-  update(id: number, createUserDto: CreateUserDto) {
-    this.verificarSeExisteUsuarios();
-
-    const index = this.users.findIndex((user) => user.id == id);
-    if (index >= 0) {
-      this.users[index] = createUserDto;
-      return this.users[index];
-    }
-    throw new HttpException(
-      'Nenhum usuário cadastrado com este id',
-      HttpStatus.BAD_REQUEST,
-    );
-  }
-
-  remove(id: number) {
-    this.verificarSeExisteUsuarios();
-
-    const index = this.users.findIndex((user) => user.id == id);
-    if (index >= 0) {
-      this.users.splice(index, 1);
-      this.frasesService.deleteAllByUserId(id);
-    } else {
+  async findAll(): Promise<User[]> {
+    try {
+      return await this.usersRepository.find();
+    } catch (error) {
       throw new HttpException(
-        'Nenhum usuário cadastrado com este id',
+        'Erro ao buscar usuários',
         HttpStatus.BAD_REQUEST,
       );
     }
   }
 
-  verificarSeExisteUsuarios() {
-    if (!this.users) {
+  async findByUsername(username: string): Promise<User> {
+    try {
+      return await this.usersRepository.findOneBy({ username: username });
+    } catch (error) {
+      throw new HttpException('Erro ao buscar usuário', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async update(id: number, createUserDto: CreateUserDto) {
+    try {
+      await this.usersRepository.update({ id: id }, createUserDto);
+      return createUserDto;
+    } catch (error) {
       throw new HttpException(
-        'Não há usuários cadastrados',
+        'Erro ao atualizar usuário',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async remove(id: number) {
+    try {
+      await this.usersRepository.delete({ id: id });
+    } catch (error) {
+      throw new HttpException(
+        'Erro ao deletar usuário',
         HttpStatus.BAD_REQUEST,
       );
     }

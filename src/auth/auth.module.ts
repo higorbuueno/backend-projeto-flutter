@@ -5,9 +5,8 @@ import { UsersService } from 'src/users/users.service';
 import { FrasesModule } from 'src/frases/frases.module';
 
 @Module({
-  imports: [FrasesModule],
   controllers: [AuthController],
-  providers: [AuthService, UsersService],
+  providers: [AuthService],
   exports: [AuthModule]
 })
 export class AuthModule {}

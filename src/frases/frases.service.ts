@@ -1,12 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateFraseDto } from './dto/create-frase.dto';
-import { DataBaseFraseDto } from './dto/database-frase.dto';
+import { FrasesByUserDto } from './dto/database-frase.dto';
+import { Frase } from './entities/frase.entity';
 
 @Injectable()
 export class FrasesService {
-  databaseFrases: DataBaseFraseDto[] = [
+  databaseFrases: FrasesByUserDto[] = [
     {
-      idUser: 1,
+      id_usuario: 1,
       listaFrases: [
         'Gostei desta frase!',
         'Desta também!',
@@ -14,44 +17,52 @@ export class FrasesService {
       ],
     },
     {
-      idUser: 2,
+      id_usuario: 2,
       listaFrases: ['O Higor vai ficar muito rico!', 'Com certeza!'],
     },
   ];
 
-  create(createFraseDto: CreateFraseDto) {
-    const index = this.databaseFrases.findIndex(
-      (frasesDoUsuario) => frasesDoUsuario.idUser == createFraseDto.idUser,
-    );
-    if (index >= 0) {
-      this.databaseFrases[index].listaFrases.push(createFraseDto.frase);
-      return this.databaseFrases[index];
-    }
-    throw new HttpException('Usuário não encontrado.', HttpStatus.BAD_REQUEST);
+  constructor(
+    @InjectRepository(Frase)
+    private frasesRepository: Repository<Frase>,
+  ) {}
+
+  async create(createFraseDto: CreateFraseDto) {
+    await this.frasesRepository.find();
   }
 
-  findAll() {
-    return this.databaseFrases;
-  }
-
-  findByUsuario(idUsuario: number) {
-    var result = this.databaseFrases.filter(
-      (frasesDoUsuario) => frasesDoUsuario.idUser == idUsuario,
-    )[0];
-
-    if (result) {
-      return result;
-    } else {
+  async findAll(): Promise<Frase[]> {
+    try {
+      return await this.frasesRepository.find();
+    } catch (error) {
       throw new HttpException(
-        'Usuário não encontrado.',
+        'Falha ao buscar frases.',
         HttpStatus.BAD_REQUEST,
       );
     }
   }
 
-  update(idUsuario: number, updateFraseDto: DataBaseFraseDto) {
+  async findByIdUsuario(idUsuario: number) {
+    try {
+      const resultEntity = await this.frasesRepository.findBy({
+        id_usuario: idUsuario,
+      });
+      var frasesDoUsuario: FrasesByUserDto = {
+        id_usuario: idUsuario,
+        listaFrases: resultEntity.map((teste) => teste.frase),
+      };
+      return frasesDoUsuario;
+    } catch (error) {
+      throw new HttpException(
+        'Falha ao buscar frases deste usuário',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  update(idUsuario: number, updateFraseDto: FrasesByUserDto) {
     const index = this.databaseFrases.findIndex(
-      (frasesDoUsuario) => frasesDoUsuario.idUser == idUsuario,
+      (frasesDoUsuario) => frasesDoUsuario.id_usuario == idUsuario,
     );
     if (index >= 0) {
       return (this.databaseFrases[index] = updateFraseDto);
@@ -61,7 +72,7 @@ export class FrasesService {
 
   remove(idUsuario: number, frase?: string) {
     const index = this.databaseFrases.findIndex(
-      (frasesDoUsuario) => frasesDoUsuario.idUser == idUsuario,
+      (frasesDoUsuario) => frasesDoUsuario.id_usuario == idUsuario,
     );
 
     if (index >= 0) {
@@ -85,7 +96,15 @@ export class FrasesService {
     throw new HttpException('Usuário não encontrado.', HttpStatus.BAD_REQUEST);
   }
 
-  deleteAllByUserId(id: number) {
-    return `This action removes a #${id} frase`;
+  async deleteAllByUserId(idUsuario: number) {
+    try {
+      // Precisa testar!
+      await this.frasesRepository.delete({ id_usuario: idUsuario });
+    } catch (error) {
+      throw new HttpException(
+        'Erro ao apagar frases do usuário.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

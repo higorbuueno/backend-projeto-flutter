@@ -1,4 +1,4 @@
 export class CreateFraseDto {
-    idUser: number;
+    id_usuario: number;
     frase: string;
 }

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { FrasesService } from './frases.service';
 import { CreateFraseDto } from './dto/create-frase.dto';
-import { DataBaseFraseDto } from './dto/database-frase.dto';
+import { FrasesByUserDto } from './dto/database-frase.dto';
 
 @Controller('frases')
 export class FrasesController {
@@ -27,11 +27,11 @@ export class FrasesController {
 
   @Get('usuario/:id')
   findByUsuario(@Param('id') id: string) {
-    return this.frasesService.findByUsuario(+id);
+    return this.frasesService.findByIdUsuario(+id);
   }
 
   @Patch('usuario/:id')
-  update(@Param('id') id: string, @Body() dataBaseFraseDto: DataBaseFraseDto) {
+  update(@Param('id') id: string, @Body() dataBaseFraseDto: FrasesByUserDto) {
     return this.frasesService.update(+id, dataBaseFraseDto);
   }
 
