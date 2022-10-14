@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FrasesService } from 'src/frases/frases.service';
 import { DeleteResult, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoginDto } from './dto/login-user.dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -60,6 +61,24 @@ export class UsersService {
       throw new HttpException(
         'Erro ao deletar usuário',
         HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async login(loginDto: LoginDto) {
+    const user = await this.usersRepository
+      .createQueryBuilder()
+      .select()
+      .where({ username: loginDto.username })
+      .andWhere({ senha: loginDto.senha })
+      .getOne();
+
+    if (user) {
+      return user;
+    } else {
+      throw new HttpException(
+        'Usuário e senha incorretos',
+        HttpStatus.NOT_FOUND,
       );
     }
   }
