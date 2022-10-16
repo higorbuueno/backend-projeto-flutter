@@ -9,7 +9,7 @@ import { Frase } from './entities/frase.entity';
 export class FrasesService {
   databaseFrases: FrasesByUserDto[] = [
     {
-      id_usuario: 1,
+      idUsuario: 1,
       listaFrases: [
         'Gostei desta frase!',
         'Desta também!',
@@ -17,7 +17,7 @@ export class FrasesService {
       ],
     },
     {
-      id_usuario: 2,
+      idUsuario: 2,
       listaFrases: ['O Higor vai ficar muito rico!', 'Com certeza!'],
     },
   ];
@@ -28,7 +28,12 @@ export class FrasesService {
   ) {}
 
   async create(createFraseDto: CreateFraseDto) {
-    await this.frasesRepository.find();
+    const fraseEntity: Frase = {
+      id: null,
+      id_usuario: createFraseDto.idUsuario,
+      frase: createFraseDto.frase,
+    };
+    await this.frasesRepository.save(fraseEntity);
   }
 
   async findAll(): Promise<Frase[]> {
@@ -48,7 +53,7 @@ export class FrasesService {
         id_usuario: idUsuario,
       });
       var frasesDoUsuario: FrasesByUserDto = {
-        id_usuario: idUsuario,
+        idUsuario: idUsuario,
         listaFrases: resultEntity.map((teste) => teste.frase),
       };
       return frasesDoUsuario;
@@ -62,7 +67,7 @@ export class FrasesService {
 
   update(idUsuario: number, updateFraseDto: FrasesByUserDto) {
     const index = this.databaseFrases.findIndex(
-      (frasesDoUsuario) => frasesDoUsuario.id_usuario == idUsuario,
+      (frasesDoUsuario) => frasesDoUsuario.idUsuario == idUsuario,
     );
     if (index >= 0) {
       return (this.databaseFrases[index] = updateFraseDto);
@@ -72,7 +77,7 @@ export class FrasesService {
 
   remove(idUsuario: number, frase?: string) {
     const index = this.databaseFrases.findIndex(
-      (frasesDoUsuario) => frasesDoUsuario.id_usuario == idUsuario,
+      (frasesDoUsuario) => frasesDoUsuario.idUsuario == idUsuario,
     );
 
     if (index >= 0) {

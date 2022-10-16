@@ -1,4 +1,4 @@
 export class FrasesByUserDto {
-    id_usuario: number;
+    idUsuario: number;
     listaFrases: string[];
 }
