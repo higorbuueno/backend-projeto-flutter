@@ -11,14 +11,11 @@ export class FrasesService {
   databaseFrases: FrasesByUserDto[] = [
     {
       idUsuario: 1,
-      listaFrases: [{ idFrase: 1, frase: 'Gostei desta frase!' }],
+      listaFrases: ['Gostei desta frase!'],
     },
     {
       idUsuario: 2,
-      listaFrases: [
-        { idFrase: 2, frase: 'O Higor vai ficar muito rico!!' },
-        { idFrase: 3, frase: 'Com certeza!' },
-      ],
+      listaFrases: ['O Higor vai ficar muito rico!!', 'Com certeza!'],
     },
   ];
 
@@ -59,10 +56,7 @@ export class FrasesService {
       };
 
       resultEntity.forEach((element) => {
-        frasesDoUsuario.listaFrases.push({
-          idFrase: element.id,
-          frase: element.frase,
-        });
+        frasesDoUsuario.listaFrases.push(element.frase);
       });
 
       return frasesDoUsuario;
@@ -105,7 +99,7 @@ export class FrasesService {
     if (index >= 0) {
       if (frase) {
         const indexFrase = this.databaseFrases[index].listaFrases.findIndex(
-          (frasesDoUsuario) => frasesDoUsuario.frase == frase,
+          (frasesDoUsuario) => frasesDoUsuario == frase,
         );
         if (indexFrase >= 0) {
           this.databaseFrases[index].listaFrases.splice(indexFrase, 1);
