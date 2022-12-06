@@ -1,4 +1,9 @@
 export class FrasesByUserDto {
     idUsuario: number;
-    listaFrases: string[];
+    listaFrases: Frase[];
+}
+
+class Frase {
+    idFrase: number;
+    frase: string;
 }

@@ -10,6 +10,7 @@ import {
 import { FrasesService } from './frases.service';
 import { CreateFraseDto } from './dto/create-frase.dto';
 import { FrasesByUserDto } from './dto/database-frase.dto';
+import { UpdateFraseDto } from './dto/update-frase.dto';
 
 @Controller('frases')
 export class FrasesController {
@@ -35,8 +36,18 @@ export class FrasesController {
     return this.frasesService.update(+id, dataBaseFraseDto);
   }
 
+  @Patch(':id')
+  updateById(@Param('id') id: number, @Body() createFraseDto: UpdateFraseDto) {
+    return this.frasesService.updateById(+id, createFraseDto);
+  }
+
   @Delete('usuario/:id')
   remove(@Param('id') id: string, @Body() createFraseDto: CreateFraseDto) {
     return this.frasesService.remove(+id, createFraseDto.frase);
+  }
+
+  @Delete(':id')
+  deleteById(@Param('id') id: string) {
+    return this.frasesService.deleteById(+id);
   }
 }

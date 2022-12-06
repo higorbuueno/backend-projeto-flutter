@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateFraseDto } from './dto/create-frase.dto';
 import { FrasesByUserDto } from './dto/database-frase.dto';
+import { UpdateFraseDto } from './dto/update-frase.dto';
 import { Frase } from './entities/frase.entity';
 
 @Injectable()
@@ -10,15 +11,14 @@ export class FrasesService {
   databaseFrases: FrasesByUserDto[] = [
     {
       idUsuario: 1,
-      listaFrases: [
-        'Gostei desta frase!',
-        'Desta também!',
-        'O Higor vai ficar muito rico!',
-      ],
+      listaFrases: [{ idFrase: 1, frase: 'Gostei desta frase!' }],
     },
     {
       idUsuario: 2,
-      listaFrases: ['O Higor vai ficar muito rico!', 'Com certeza!'],
+      listaFrases: [
+        { idFrase: 2, frase: 'O Higor vai ficar muito rico!!' },
+        { idFrase: 3, frase: 'Com certeza!' },
+      ],
     },
   ];
 
@@ -52,10 +52,19 @@ export class FrasesService {
       const resultEntity = await this.frasesRepository.findBy({
         id_usuario: idUsuario,
       });
+
       var frasesDoUsuario: FrasesByUserDto = {
         idUsuario: idUsuario,
-        listaFrases: resultEntity.map((teste) => teste.frase),
+        listaFrases: [],
       };
+
+      resultEntity.forEach((element) => {
+        frasesDoUsuario.listaFrases.push({
+          idFrase: element.id,
+          frase: element.frase,
+        });
+      });
+
       return frasesDoUsuario;
     } catch (error) {
       throw new HttpException(
@@ -75,6 +84,19 @@ export class FrasesService {
     throw new HttpException('Usuário não encontrado.', HttpStatus.BAD_REQUEST);
   }
 
+  async updateById(id: number, frase: UpdateFraseDto) {
+    const fraseToSave: Frase = {
+      id: id,
+      frase: frase.frase,
+      id_usuario: frase.idUsuario,
+    };
+    try {
+      await this.frasesRepository.save(fraseToSave);
+    } catch (error) {
+      throw new HttpException('Erro ao apagar frase.', HttpStatus.BAD_REQUEST);
+    }
+  }
+
   remove(idUsuario: number, frase?: string) {
     const index = this.databaseFrases.findIndex(
       (frasesDoUsuario) => frasesDoUsuario.idUsuario == idUsuario,
@@ -83,7 +105,7 @@ export class FrasesService {
     if (index >= 0) {
       if (frase) {
         const indexFrase = this.databaseFrases[index].listaFrases.findIndex(
-          (frasesDoUsuario) => frasesDoUsuario == frase,
+          (frasesDoUsuario) => frasesDoUsuario.frase == frase,
         );
         if (indexFrase >= 0) {
           this.databaseFrases[index].listaFrases.splice(indexFrase, 1);
@@ -99,6 +121,14 @@ export class FrasesService {
       return this.databaseFrases[index];
     }
     throw new HttpException('Usuário não encontrado.', HttpStatus.BAD_REQUEST);
+  }
+
+  async deleteById(id: number) {
+    try {
+      await this.frasesRepository.delete({ id: id });
+    } catch (error) {
+      throw new HttpException('Erro ao apagar frase.', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async deleteAllByUserId(idUsuario: number) {
