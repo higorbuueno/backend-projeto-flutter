@@ -91,30 +91,15 @@ export class FrasesService {
     }
   }
 
-  remove(idUsuario: number, frase?: string) {
-    const index = this.databaseFrases.findIndex(
-      (frasesDoUsuario) => frasesDoUsuario.idUsuario == idUsuario,
-    );
-
-    if (index >= 0) {
-      if (frase) {
-        const indexFrase = this.databaseFrases[index].listaFrases.findIndex(
-          (frasesDoUsuario) => frasesDoUsuario == frase,
-        );
-        if (indexFrase >= 0) {
-          this.databaseFrases[index].listaFrases.splice(indexFrase, 1);
-        } else {
-          throw new HttpException(
-            'Frase não encontrada.',
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-      } else {
-        this.databaseFrases[index].listaFrases = [];
-      }
-      return this.databaseFrases[index];
+  async remove(idUsuario: number, frase?: string) {
+    try {
+      await this.frasesRepository.delete({
+        frase: frase,
+        id_usuario: idUsuario,
+      });
+    } catch (error) {
+      throw new HttpException('Erro ao apagar frase.', HttpStatus.BAD_REQUEST);
     }
-    throw new HttpException('Usuário não encontrado.', HttpStatus.BAD_REQUEST);
   }
 
   async deleteById(id: number) {
